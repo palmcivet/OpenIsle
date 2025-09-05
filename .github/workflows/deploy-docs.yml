@@ -25,11 +25,37 @@ jobs:
         run: mvn install -DskipTests
         working-directory: ./backend
 
-      - name: Generate OpenAPI documentation
+      - name: Start Spring Boot application in background
         env:
           MYSQL_URL: jdbc:h2:mem:openisle;DB_CLOSE_DELAY=-1
+          spring.jpa.hibernate.ddl-auto: create-drop
+          SERVER_PORT: 8080
+        run: mvn spring-boot:run &
+        working-directory: ./backend
+
+      - name: Wait for application to start
+        run: |
+          echo "Waiting for Spring Boot to start..."
+          # 等待最多30秒
+          timeout=30
+          while ! curl -s http://localhost:8080/api/v3/api-docs > /dev/null
+          do
+            timeout=$((timeout - 1))
+            if [ $timeout -le 0 ]; then
+              echo "Timed out waiting for Spring Boot to start"
+              exit 1
+            fi
+            echo "Still waiting... ($timeout seconds left)"
+            sleep 1
+          done
+          echo "Spring Boot application is up and running!"
+
+      - name: Generate OpenAPI documentation
         run: mvn springdoc-openapi:generate
         working-directory: ./backend
+
+      - name: Stop Spring Boot application
+        run: pkill -f "java -jar" || true
 
       - name: Copy OpenAPI spec to docs
         run: cp ./backend/target/openapi.json ./docs/openapi.json
