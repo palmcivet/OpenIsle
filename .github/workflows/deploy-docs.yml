@@ -21,9 +21,13 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Install Maven dependencies
+        run: mvn install -DskipTests
+        working-directory: ./backend
+
       - name: Generate OpenAPI documentation
         env:
-          MYSQL_URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+          MYSQL_URL: jdbc:h2:mem:openisle;DB_CLOSE_DELAY=-1
         run: mvn springdoc-openapi:generate
         working-directory: ./backend
 
@@ -35,7 +39,7 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install dependencies
+      - name: Install Bun dependencies
         run: bun install
         working-directory: ./docs
 
