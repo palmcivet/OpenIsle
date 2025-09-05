@@ -1,7 +1,9 @@
-import { docs } from '@/.source';
+import { createElement } from 'react';
+import { icons } from 'lucide-react';
 import { loader } from 'fumadocs-core/source';
 import { transformerOpenAPI } from 'fumadocs-openapi/server';
 import { createOpenAPI } from 'fumadocs-openapi/server';
+import { docs } from '@/.source';
 import * as Adapters from './media-adapter';
 import * as ClientAdapters from './media-adapter.client';
 
@@ -12,6 +14,14 @@ export const source = loader({
   source: docs.toFumadocsSource(),
   pageTree: {
     transformers: [transformerOpenAPI()],
+  },
+  icon(icon) {
+    if (!icon) {
+      return;
+    }
+    if (icon in icons) {
+      return createElement(icons[icon as keyof typeof icons]);
+    }
   },
 });
 
