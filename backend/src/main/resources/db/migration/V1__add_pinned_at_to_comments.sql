@@ -1,1 +1,0 @@
-ALTER TABLE comments ADD COLUMN pinned_at DATETIME(6) NULL;
