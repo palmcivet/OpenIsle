@@ -1,0 +1,50 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches: [main]
+    # paths:
+    #   - './backend/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-docs:
+    runs-on: maven:3.9-eclipse-temurin-17
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Generate OpenAPI documentation
+        run: mvn springdoc-openapi:generate
+        working-directory: ./backend
+
+      - name: Copy OpenAPI spec to docs
+        run: cp ./backend/target/openapi.json ./docs/openapi.json
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: ./docs
+
+      - name: Generate API MDX
+        run: bun run generate
+        working-directory: ./docs
+
+      - name: Build documentation
+        run: bun run build
+        working-directory: ./docs
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: ./docs/out
