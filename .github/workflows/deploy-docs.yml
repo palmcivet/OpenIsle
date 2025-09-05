@@ -12,7 +12,9 @@ permissions:
 
 jobs:
   build-docs:
-    runs-on: maven:3.9-eclipse-temurin-17
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3.9-eclipse-temurin-17
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
