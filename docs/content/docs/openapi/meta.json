@@ -1,0 +1,6 @@
+{
+  "title": "Open API",
+  "description": "OpenIsle 后端 API 文档",
+  "pages": ["index", "...(generated)"],
+  "root": true
+}
